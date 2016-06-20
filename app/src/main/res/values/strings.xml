@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Book Shop</string>
+
+    <string name="signup">Sign Up</string>
+
+
 </resources>
