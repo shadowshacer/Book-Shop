@@ -2,16 +2,21 @@ package neu.thitimongkonwat.kanpong.bookshop;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SearchRecentSuggestionsProvider;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity { //Main Class
 
@@ -38,6 +43,9 @@ public class MainActivity extends AppCompatActivity { //Main Class
 
         private Context context;
         private String urlString;
+        private boolean statusAboolean = true;
+        private String truePasswordString;
+        private String nameloginString;
 
         public MySynchronize(Context context, String urlString) {
             this.context = context;
@@ -67,6 +75,47 @@ public class MainActivity extends AppCompatActivity { //Main Class
             super.onPostExecute(s);
 
             Log.d("BookShopV1", "JSON ==>" +s);
+
+            try{
+                JSONArray jsonArray = new JSONArray(s);
+                for (int i=0;i<jsonArray.length();i++){ //for วนลูป
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    if (userString.equals(jsonObject.getString("User"))) { // if
+                        statusAboolean = false;
+                        truePasswordString = jsonObject.getString("Password");
+                        nameloginString = jsonObject.getString("Name");
+                    } // end if
+
+
+                } // end for
+
+                //checkUser
+                if (statusAboolean) {
+                    MyAlert myAlert = new MyAlert();
+                    myAlert.MyDialog(context, "ไม่มี User นี้",
+                            "ไม่มี" + userString + "ในฐานข้อมูลของเรา");
+                } else if (passwordString.equals(truePasswordString)) {
+                    //password true
+
+                    Intent intent = new Intent(context, BookActivity.class);
+                    intent.putExtra("Name", nameloginString);
+                    startActivity(intent);
+
+                    Toast.makeText(context, "Welcome User", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    //Password False
+                    MyAlert myAlert  = new MyAlert();
+                    myAlert.MyDialog(context, "Password False",
+                            "Please Try Again Password False");
+
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     } //End Inner Class
 
